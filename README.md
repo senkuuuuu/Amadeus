@@ -13,39 +13,47 @@ I did my best to make it as anime-accurate as possible, with that said below con
 el psy kongroo -
 
 ### 🖥️ Installation
-**Option 1: clone the repository and bundle the app yourself**
+**OPTION 1: clone the repository and bundle the app yourself**
+- Step 1: clone the repository
+```
+git https://github.com/senkuuuuu/Amadeus.git
+```
 
-**Step 1:** clone the repository
-git https://github.com/senkuuuuu/-proj.-10-Amadeus.git
-
-**Step 2:** Install dependencies, you can make a virtual environment if you want to
+- Step 2: Install dependencies, you can make a virtual environment if you want to
 ```
 pip install -r requirements.txt
-```
-or
-```
-pip install pygame-ce==2.5.5 pygame_gui==0.6.14 yaudio soundfile numpy sounddevice python-dotenv SpeechRecognition transformers torch git+https://github.com/Xtr4F/PyCharacterAI.git@5629da4820bcd15bbb991cf0e5cd23f54d106cdd
+--------------or-------------
+pip install pygame-ce==2.5.5 pygame_gui==0.6.14 pyaudio soundfile numpy sounddevice python-dotenv SpeechRecognition transformers torch git+https://github.com/Xtr4F/PyCharacterAI.git@5629da4820bcd15bbb991cf0e5cd23f54d106cdd
 ```
 
-**Step 3:** create an account in unrealspeech then obtain your own auth key
+- Step 3: create an account in unrealspeech then obtain your own auth key:
 https://unrealspeech.com/
 
-**Step 4:** find your own character ai token/key. go to the link below to find how:
+- Step 4: find your own character ai token/key. go to the link below to find how:
 https://github.com/Xtr4F/PyCharacterAI
 
-**Step 5:** create your own .env file then add the following:
+- Step 5: create your own .env file then add the following:
 ```
 CHARACTER_AI_TOKEN = "your character ai token"
 UNREAL_VOICE_AUTHORIZATION_KEY = "your unreal voice auth key"
 ```
 
-**Step 6:** use pyinstaller to bundle the codebase
+- Step 6: use pyinstaller to bundle the codebase
 ```
-pyinstaller --onefile --name=Amadeus --icon=logo.ico --add-data "resources;resources" --windowed main.py
+pyinstaller --onefile --name=Amadeus --icon=logo.ico --add-data "resources;resources" --add-data "emotion_analysis/custom_models/amadeus_1/*;emotion_analysis/custom_models/amadeus_1" --windowed main.py
 ```
+<br>
 
-**Option 2: Install the readily available bundled version of the application _(COMING SOON)_**
-Currently, the app relies on API keys (for CharacterAI and UnrealSpeech), but I plan to remove this requirement in the future so that less technically inclined fans can still enjoy a desktop version of our beloved Amadeus
+**OPTION 2: Install the readily  bundled version of the application _(COMING SOON)_**
+
+Currently, the app requires API keys (for CharacterAI and UnrealSpeech), but I’m working to eliminate this dependency. Soon, the app will:
+
+- Run fully offline – No internet or API keys needed _(if i managed to bundle a local GPT model in the app)_.
+- Be easier to use – A simple install for less tech-savvy users.
+
+This upgrade will make Amadeus truly accessible to everyone—no technical hurdles, just plug-and-play. If you’d like to support this project (and help speed up development!), consider [donating](https://ko-fi.com/makisekurisu22217) or sharing with fellow fans! Every bit of support keeps Amadeus evolving.
+
+Stay tuned—exciting updates are on the way!
 
 
 ---
@@ -53,7 +61,7 @@ Currently, the app relies on API keys (for CharacterAI and UnrealSpeech), but I 
 ### ⭐ Features
 | Feature                      | Description                                                                 |
 |------------------------------|-----------------------------------------------------------------------------|
-| **Log-in system**            | Uses a file-based database controlled by the main app via SQLite.           |
+| **Log-in system**            | Uses a file-based database controlled by the main app via SQLite. log in using the credentials listed below: <br>**username:** `salieri` <br>**password:** `steins;gate` <br>**note:** case-sensitive|
 | **Seamless GUI design**      | Achieved through a combination of `asyncio`, `pygame`, and `pygame_gui`.    |
 | **Voice input**              | Implemented using `PyAudio`, `wave`, and `SpeechRecognition` modules.       |
 | **Expressive character animation** | Powered by emotion analysis using a custom-trained DistilBERT model (trained on 3,000+ data points). |
