@@ -143,5 +143,57 @@
                         "resource": "console.ttf"
                     }
             }
+    },
+    "UITextEntryLine": {
+        "colours": {
+            "dark_bg": "#202020",
+            "normal_text": "#00B3FF",  
+            "selected_text": "#FFFFFF",
+            "selected_text_background": "#555555",
+            "border": "#808080",
+            "filled_bar": "#00B3FF"
+        },
+        "font": {
+            "name": "fira_code",
+            "size": 14,
+            "bold": 0,
+            "italic": 0
+        }
+
+    },
+
+    "#user_text_input": {
+        "font":
+            {
+                "name": "console",
+                "size": "12",
+                "regular_resource": 
+                    {
+                        "package": "resources.fonts",
+                        "resource": "console.ttf"
+                    },
+                "bold_resource": 
+                    {
+                        "package": "resources.fonts",
+                        "resource": "console.ttf"
+                    }
+            }
+    },
+    "#send_text_button": {
+        "font":
+            {
+                "name": "console",
+                "size": "12",
+                "regular_resource": 
+                    {
+                        "package": "resources.fonts",
+                        "resource": "console.ttf"
+                    },
+                "bold_resource": 
+                    {
+                        "package": "resources.fonts",
+                        "resource": "console.ttf"
+                    }
+            }
     }
 }

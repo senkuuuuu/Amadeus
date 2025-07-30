@@ -14,63 +14,81 @@ class AI:
     async def create_chatroom(self, user_id: str) -> str | None:
         try:
             client = await get_client(token=self.client_token)
-
-            #initializing mange data class
             manage_data = EditData()
-
-            #getting chat id
             chat, greeting_message = await client.chat.create_chat(self.character_id)
             chat_id = chat.chat_id
             manage_data.add_chatroom(user_id, chat_id)
-
             return chat_id
         except Exception as e:
-            print(e)
-            pass
+            print(f"Error creating chatroom: {e}")
+            return None
 
-    async def interpret(self, message: str, chat_id: str) -> str | None:
+    async def generate_response(self, message: str, chat_id: str) -> dict:
+        """
+        Generates both text and voice response from CharacterAI
+        Returns: {
+            'text': str, 
+            'audio': bytes,
+            'turn_id': str,
+            'candidate_id': str,
+            'has_audio': bool
+        }
+        """
         try:
             client = await get_client(token=self.client_token)
-
-            answer = await client.chat.send_message(self.character_id, chat_id, message)
-            return f'{answer.get_primary_candidate().text}'
-        except Exception as e:
-            print(e)
-            pass
-
-
-
-
-'''Using aiocai but since it broken we'll use pycharaterai insteaad (28/06/2025)'''
-
-'''
-from characterai import aiocai
-import asyncio
-
-class AI:
-    def __init__(self, input):
-        self.client = aiocai.Client('token')
-        self.character_id = "character_id"
-        self.message = input
-        self.chat_id = None
-    
-    async def interpret(self):
-        try:
-            me = await self.client.get_me()
             
-            async with await self.client.connect()as chat:
-                new_chat, initial_message = await chat.new_chat(self.character_id, me.id)
-                self.chat_id = new_chat.chat_id
-
-                message = await chat.send_message(self.character_id, self.chat_id, self.message)
-
-                response = f'{message.text}'
-                
-            return response
-        except asyncio.TimeoutError:
-            print("The operation timed out.")
-            return '....'
+            # Get text response with streaming to ensure we get all metadata
+            answer = await client.chat.send_message(
+                self.character_id, 
+                chat_id, 
+                message, 
+                streaming=True
+            )
+            
+            # Collect the full response text and metadata
+            full_text = ""
+            turn_id = None
+            candidate_id = None
+            has_audio = False
+            
+            async for msg in answer:
+                full_text = msg.get_primary_candidate().text
+                if hasattr(msg, 'turn_id') and msg.turn_id:
+                    turn_id = msg.turn_id
+                candidate_id = msg.get_primary_candidate().candidate_id
+            
+            # Get voice data if we have the required IDs
+            voices = await client.utils.search_voices("Makise Kurisu")
+            for voice in voices:
+                print(f"{voice.name} [{voice.voice_id}]")
+          
+            audio_bytes = None
+            if turn_id and candidate_id:
+                try:
+                    audio_bytes = await client.utils.generate_speech(
+                        chat_id,
+                        turn_id,
+                        candidate_id,
+                        '01efecb5-77c9-43ed-b262-39b331be488f'
+                    )
+                    has_audio = True
+                except Exception as e:
+                    print(f"Couldn't generate speech: {e}")
+            
+            return {
+                'text': full_text,
+                'audio': audio_bytes,
+                'turn_id': turn_id,
+                'candidate_id': candidate_id,
+                'has_audio': has_audio
+            }
+            
         except Exception as e:
-            print(f"An error occurred: {e}")
-            return '....'
-'''
+            print(f"Error generating response: {e}")
+            return {
+                'text': "Sorry, I couldn't process that request.",
+                'audio': None,
+                'turn_id': None,
+                'candidate_id': None,
+                'has_audio': False
+            }

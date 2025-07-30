@@ -1,9 +1,9 @@
 import time
 import os
+import traceback
 import speech_recognition as sr
 from queue import Queue
 
-#this dosen't work for python 3.13+
 class VoiceToText:
     def __init__(self) -> None:
         self.result_queue = Queue()
@@ -11,21 +11,23 @@ class VoiceToText:
     def begin(self) -> None:
         try:
             time.sleep(0.2)
-            # Initialize the recognizer
             recognizer = sr.Recognizer()
 
-            # Open the audio file
-            with sr.AudioFile("temp_input.wav") as source:
-                # Record the audio data
+            audio_path = "temp_input.wav"
+            if not os.path.exists(audio_path):
+                raise FileNotFoundError(f"Audio file '{audio_path}' not found.")
+
+            with sr.AudioFile(audio_path) as source:
                 audio_data = recognizer.record(source)
 
-                # Recognize speech using Google Speech Recognition
-                text = recognizer.recognize_google(audio_data)
-            
-            os.remove("temp_input.wav")
-            
+            text = recognizer.recognize_google(audio_data, language="en-US")
+
+            print(text)
             return text
+
         except Exception as e:
-            print(e)
-            return '...'
+            print("Error:", e)
+            traceback.print_exc()
+            return 'Hows the Time machine going?'
+
     

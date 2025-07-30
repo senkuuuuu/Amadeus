@@ -123,7 +123,6 @@ class Login:
         else:
             result, user_id = FetchData().check_user(user_name, password)
             if result:
-                self.dialogbox.show_popup('info', 'You are now able to talk with the memory of makise kurisu, El Psy Congroo...')
                 return True, user_id
                 
             else:
