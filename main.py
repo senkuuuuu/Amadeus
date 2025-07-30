@@ -4,7 +4,6 @@ from modules.windows.amadeus_window import Amadeus
 import asyncio
 import pygame
 
-#metadata
 pygame.init()
 
 background_color = (0, 0, 0)

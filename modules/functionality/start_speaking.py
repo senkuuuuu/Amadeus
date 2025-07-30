@@ -47,41 +47,34 @@ class StartSpeaking:
         return result
 
     def begin(self) -> None:
-        try:
-            y, sr = sf.read(self.file_path)
-            if y.ndim > 1:
-                y = np.mean(y, axis=1)  # stereo → mono
+        y, sr = sf.read(self.file_path)
+        if y.ndim > 1:
+            y = np.mean(y, axis=1)  # stereo → mono
 
-            rms = self.compute_rms(y, frame_size=2048, hop_length=512)
-            frame_times = np.arange(len(rms)) * 512 / sr
+        rms = self.compute_rms(y, frame_size=2048, hop_length=512)
+        frame_times = np.arange(len(rms)) * 512 / sr
 
-            sd.play(y, sr)
-            start_time = time.monotonic()
-            silence_threshold = 0.01
-            is_talking = False
+        sd.play(y, sr)
+        start_time = time.monotonic()
+        silence_threshold = 0.01
+        is_talking = False
 
-            self.start_thinking.clear()
+        self.start_thinking.clear()
 
-            while sd.get_stream().active:
-                current_time = time.monotonic() - start_time
-                current_frame = np.searchsorted(frame_times, current_time)
+        while sd.get_stream().active:
+            current_time = time.monotonic() - start_time
+            current_frame = np.searchsorted(frame_times, current_time)
 
-                voice_active = (
-                    current_frame < len(rms) and
-                    rms[current_frame] >= silence_threshold
+            voice_active = (
+                current_frame < len(rms) and
+                rms[current_frame] >= silence_threshold
+            )
+
+            if voice_active != is_talking:
+                is_talking = voice_active
+                asyncio.run_coroutine_threadsafe(
+                    self.update_state(is_talking), self.loop
                 )
 
-                if voice_active != is_talking:
-                    is_talking = voice_active
-                    asyncio.run_coroutine_threadsafe(
-                        self.update_state(is_talking), self.loop
-                    )
-
-                time.sleep(0.01)
-
-        finally:
-            asyncio.run_coroutine_threadsafe(
-                self.update_state(False), self.loop
-            )
-            os.remove(self.file_path)
+            time.sleep(0.01)
 
